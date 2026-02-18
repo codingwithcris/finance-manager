@@ -3,14 +3,11 @@ import java.util.Scanner;
 class PersonalFinanceManager {
     public double income;
     public double expense;
-    public String transactions[];
 
-    // default
     public PersonalFinanceManager() {
         income = 0;
     } 
 
-    // user can begin with a specific income
     public PersonalFinanceManager(double income) {
         this.income = income;
     }
@@ -28,19 +25,14 @@ class PersonalFinanceManager {
             return this.income;
         }
 
-        return Math.floor(this.income - this.expense);
+        return this.income - this.expense;
     }
-
-    // public String viewTransactions() {
-    //     for (String transaction: transactions) {
-    //         System.out.println(transaction);
-    //     }
-    // }
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         PersonalFinanceManager manager = new PersonalFinanceManager();
         String userResponse;
+        // String category;
         double amount;
         
         do {
@@ -59,14 +51,19 @@ class PersonalFinanceManager {
                 
                 System.out.print("How is this transaction categorized: ");
                 userResponse = scanner.nextLine();
+                // category = userResponse;
+
                 if (userResponse.equalsIgnoreCase("expense")) {
                     manager.addExpense(amount);
                 } else {
                     manager.addIncome(amount);
                 }
+
+                // String transaction = String.format(category + ": $%.2f", amount);
             }
 
-            if (userResponse.equals("3")) System.out.println(manager.calculateBalance());
+            if (userResponse.equals("3")) 
+                System.out.printf("Balance: $%.2f%n", manager.calculateBalance());
 
         } while (!userResponse.equalsIgnoreCase("4"));
         scanner.close();
