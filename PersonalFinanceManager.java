@@ -12,12 +12,14 @@ class PersonalFinanceManager {
         this.income = income;
     }
 
-    public void addExpense(double amount) {
-        this.expense += amount;
-    }
-
-    public void addIncome(double amount) {
-        this.income += amount;
+    public void addTransaction(String type, double amount) {
+        if (type.equalsIgnoreCase("expense")) {
+            this.expense += amount;
+        } 
+        
+        if (type.equalsIgnoreCase("deposit")) {
+            this.income += amount;
+        }
     }
 
     public double calculateBalance() {
@@ -32,15 +34,13 @@ class PersonalFinanceManager {
         Scanner scanner = new Scanner(System.in);
         PersonalFinanceManager manager = new PersonalFinanceManager();
         String userResponse;
-        // String category;
-        double amount;
+        String type;
+        double amount;    
         
         do {
             System.out.println("What would you like to do:");
             System.out.println("1. Add a transaction");
-            System.out.println("2. View all transactions");
-            System.out.println("3. View balance");
-            System.out.println("4. Quit");
+            System.out.println("2. Quit");
 
             userResponse = scanner.nextLine();
 
@@ -49,23 +49,15 @@ class PersonalFinanceManager {
                 userResponse = scanner.nextLine();
                 amount = Double.valueOf(userResponse);
                 
-                System.out.print("How is this transaction categorized: ");
+                System.out.print("What is the type of transaction: ");
                 userResponse = scanner.nextLine();
-                // category = userResponse;
+                type = userResponse;
 
-                if (userResponse.equalsIgnoreCase("expense")) {
-                    manager.addExpense(amount);
-                } else {
-                    manager.addIncome(amount);
-                }
+                manager.addTransaction(type, amount);
 
-                // String transaction = String.format(category + ": $%.2f", amount);
-            }
-
-            if (userResponse.equals("3")) 
                 System.out.printf("Balance: $%.2f%n", manager.calculateBalance());
-
-        } while (!userResponse.equalsIgnoreCase("4"));
+            }
+        } while (!userResponse.equalsIgnoreCase("2"));
         scanner.close();
     }
 }
