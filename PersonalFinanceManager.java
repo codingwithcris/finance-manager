@@ -1,36 +1,48 @@
+import java.util.Arrays;
 import java.util.Scanner;
 
 class PersonalFinanceManager {
-    public double income;
-    public double expense;
     public double balance;
+    public double[] income;
+    public double[] expenses;
+    public int incomeCount = 0;
+    public int expensesCount = 0;
 
     public PersonalFinanceManager() {
-        this.income = 0;
-        this.expense = 0;
         this.balance = 0;
+        this.income = new double[0];
+        this.expenses = new double[0];
     } 
 
-    public PersonalFinanceManager(double income) {
-        this.income = income;
-        this.balance = income;
-        this.expense = 0;
-    }
-
     public void addTransaction(String type, double amount) {
-        if (type.equalsIgnoreCase("expense")) {
-            this.expense += amount;
-        } 
-        
         if (type.equalsIgnoreCase("income")) {
-            this.income += amount;
+            this.income = Arrays.copyOf(this.income, income.length + 1);
+            this.income[incomeCount] = amount;
+            incomeCount++;
         }
 
-        calculateBalance();
+        if (type.equalsIgnoreCase("expense")) {
+            this.expenses = Arrays.copyOf(this.expenses, expenses.length + 1);
+            this.expenses[expensesCount] = amount;
+            expensesCount++;
+        }
+    }
+
+    public double sumTotal(double[] array) {
+        double total = 0;
+
+        for (double element : array) {
+            total += element;
+        }
+
+        return total;
     }
 
     public void calculateBalance() {
-        this.balance = this.income - this.expense;
+        double totalIncome = sumTotal(income);
+        double totalExpenses = sumTotal(expenses);
+
+        this.balance = totalIncome - totalExpenses;
     }
 
     public double getBalance() {
@@ -39,8 +51,8 @@ class PersonalFinanceManager {
 
     public void viewTotals() {
         System.out.printf("Balance: $%.2f%n", this.balance);
-        System.out.printf("Income: $%.2f%n", this.income);
-        System.out.printf("Expense: $%.2f%n", this.expense);
+        System.out.printf("Income: $%.2f%n", sumTotal(income));
+        System.out.printf("Expense: $%.2f%n", sumTotal(expenses));
     }
 
     public static void main(String[] args) {
@@ -57,12 +69,11 @@ class PersonalFinanceManager {
             userResponse = scanner.nextLine().trim();
 
             if (userResponse.equals("1")) {
-                System.out.print("What is the type for this transaction (income/expense): ");
-                userResponse = scanner.nextLine().trim();
-                String type = userResponse;
 
+                System.out.printf("What is the type for transaction (income/expense): ");
+                String type = scanner.nextLine().trim();
                 
-                System.out.print("What is the amount for this transaction: ");
+                System.out.print("What is the amount for transaction: ");
                 if (!scanner.hasNextDouble()) {
                     System.out.println("Invalid amount. Please enter a number");
                     continue;
@@ -70,13 +81,14 @@ class PersonalFinanceManager {
                     
                 double amount = scanner.nextDouble();
                 scanner.nextLine();
-                    
+                
                 if (amount < 0) {
-                    System.out.println("Amount cannot be negative");
+                    System.out.println("Amount cannot be a negative number");
                     continue;
                 }
-
+                
                 manager.addTransaction(type, amount);
+                manager.calculateBalance();
 
                 System.out.printf("Balance: $%.2f%n", manager.getBalance());
             }
