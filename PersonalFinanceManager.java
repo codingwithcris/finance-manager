@@ -1,93 +1,108 @@
 import java.util.ArrayList;
 import java.util.Scanner;
 
+class FinanceRecord {
+    private String transactionType;
+    private String transactionDescription;
+    private double transactionAmount;
+
+    public FinanceRecord(String type, 
+                         String description, 
+                         double amount) {
+        this.transactionType = type;
+        this.transactionDescription = description;
+        this.transactionAmount = amount;
+    }
+
+    public String getTransactionType() {
+        return transactionType;
+    }
+
+    public String getTransactionDescription() {
+        return transactionDescription;
+    }
+
+    public double getTransactionAmount() {
+        return transactionAmount;
+    }
+}
+
 class PersonalFinanceManager {
     public double balance;
-    public ArrayList<Double> incomeAmount = new ArrayList<>();
-    public ArrayList<String> incomeDescription = new ArrayList<>();
-    public ArrayList<Double> expenseAmount = new ArrayList<>();
-    public ArrayList<String> expenseDescription = new ArrayList<>();
+    public ArrayList<FinanceRecord> records = new ArrayList<>();
 
     public PersonalFinanceManager() {
         this.balance = 0;
     } 
 
     public void addIncome(String type, double amount) {
-        incomeAmount.add(amount);
-        incomeDescription.add(type);
+        FinanceRecord income = new FinanceRecord("Income", type, amount);
+        records.add(income);
 
         System.out.printf("Income added: %s - $%.2f%n", type, amount);
     }
 
     public void addExpense(String type, double amount) {
-        expenseAmount.add(amount);
-        expenseDescription.add(type);
+        FinanceRecord expense = new FinanceRecord("Expense", type, amount);
+        records.add(expense);
 
         System.out.printf("Expense added: %s - $%.2f%n", type, amount);
     }
 
     public void calculateBalance() {
-        double totalIncome = sumTotal(incomeAmount);
-        double totalExpenses = sumTotal(expenseAmount);
+        double totalIncome = 0;
+        double totalExpenses = 0;
 
+        for (FinanceRecord record : records) {
+            if (record.getTransactionType().equalsIgnoreCase("income")) {
+                totalIncome += record.getTransactionAmount();
+            } else if (record.getTransactionType().equalsIgnoreCase("expense")) {
+                totalExpenses += record.getTransactionAmount();
+            }
+        }
+        
         this.balance = totalIncome - totalExpenses;
     }
 
-    public void clearAllTransactions() {
-        incomeAmount.clear();
-        incomeDescription.clear();
-        expenseAmount.clear();
-        expenseDescription.clear();
+    public void clearAllRecords() {
+        records.clear();
         calculateBalance();
-        System.out.println("All transactions have been cleared");
+        System.out.println("All records have been cleared");
     }
-
-    public double sumTotal(ArrayList<Double> transactionType) {
-        double totalAmount = 0;
-
-        for (int i = 0; i < transactionType.size(); i++) {
-            double transactionAmount = transactionType.get(i);
-            totalAmount += transactionAmount;
+    
+    public void viewAllRecords() {
+        if (records.size() == 0) {
+            System.out.println("There are no records found");
+        } else {
+            System.out.println("------ RECORDS ------");
+            for (FinanceRecord record : records) {
+                System.out.printf(
+                    "%s(%s): $%.2f%n",
+                    record.getTransactionType(), 
+                    record.getTransactionDescription(), 
+                    record.getTransactionAmount()
+                );
+            }
         }
-
-        return totalAmount;
     }
 
     public void viewTotals() {
+        double totalIncome = 0;
+        double totalExpenses = 0;
+
+        for (FinanceRecord record : records) {
+            if (record.getTransactionType().equalsIgnoreCase("income")) {
+                totalIncome += record.getTransactionAmount();
+            } else if (record.getTransactionType().equalsIgnoreCase("expense")) {
+                totalExpenses += record.getTransactionAmount();
+            }
+        }
+        
         System.out.printf("Balance: $%.2f%n", this.balance);
-        System.out.printf("Income: $%.2f%n", sumTotal(incomeAmount));
-        System.out.printf("Expense: $%.2f%n", sumTotal(expenseAmount));
+        System.out.printf("Income: $%.2f%n", totalIncome);
+        System.out.printf("Expenses: $%.2f%n", totalExpenses);
     }
-    
-    public void viewAllTransactions() {
-        double amount;
-        String type;
 
-        System.out.println("----- INCOME LOG -----");
-        if (incomeAmount.size() == 0) {
-            System.out.println("No income recorded");
-        } else {
-            for (int i = 0; i < incomeAmount.size(); i++) {
-                amount = incomeAmount.get(i);
-                type = incomeDescription.get(i);
-                
-                System.out.printf("%s: $%.2f%n", type, amount);
-            }
-        }
-
-        System.out.println("----- EXPENSES LOG -----");
-        if (expenseAmount.size() == 0) {
-            System.out.println("No expenses recorded");
-        } else {
-            for (int i = 0; i < expenseAmount.size(); i++) {
-                amount = expenseAmount.get(i);
-                type = expenseDescription.get(i);
-                
-                System.out.printf("%s: $%.2f%n", type, amount);
-            }
-        }
-
-    }
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         PersonalFinanceManager manager = new PersonalFinanceManager();
@@ -96,12 +111,12 @@ class PersonalFinanceManager {
         String expenseType;
         
         do {
-            System.out.println("----- MENU -----");
+            System.out.println("------ MENU ------");
             System.out.println("1. Add income");
             System.out.println("2. Add expense");
             System.out.println("3. View totals");
-            System.out.println("4. View all transactions");
-            System.out.println("5. Clear all transactions");
+            System.out.println("4. View all records");
+            System.out.println("5. Clear all records");
             System.out.print("Select an option or enter 'EXIT': ");
 
             userResponse = scanner.nextLine().trim();
@@ -110,7 +125,7 @@ class PersonalFinanceManager {
                 System.out.println("Select the income type:");
                 System.out.println("1. Salary");
                 System.out.println("2. Gift");
-                System.out.println("3. Scholarship/Grant");
+                System.out.println("3. Scholarship");
                 System.out.println("4. Freelance");
                 System.out.println("5. Other");
                 System.out.print("Choose (1-5): ");
@@ -122,7 +137,7 @@ class PersonalFinanceManager {
                 } else if (userResponse.equals("2")) {
                     incomeType = "Gift";
                 } else if (userResponse.equals("3")) {
-                    incomeType = "Scholarship/Grant";
+                    incomeType = "Scholarship";
                 } else if (userResponse.equals("4")) {
                     incomeType = "Freelance";
                 } else {
@@ -139,8 +154,8 @@ class PersonalFinanceManager {
                 double incomeAmount = scanner.nextDouble();
                 scanner.nextLine();
                 
-                if (incomeAmount < 0) {
-                    System.out.println("The income amount cannot be a negative number");
+                if (incomeAmount <= 0) {
+                    System.out.println("The income amount cannot be a zero or negative number");
                     continue;
                 }
 
@@ -182,8 +197,8 @@ class PersonalFinanceManager {
                 double expenseAmount = scanner.nextDouble();
                 scanner.nextLine();
                 
-                if (expenseAmount < 0) {
-                    System.out.println("The expense amount cannot be a negative number");
+                if (expenseAmount <= 0) {
+                    System.out.println("The expense amount cannot be a zero or negative number");
                     continue;
                 }
 
@@ -194,9 +209,9 @@ class PersonalFinanceManager {
 
             if (userResponse.equals("3")) manager.viewTotals();
 
-            if (userResponse.equals("4")) manager.viewAllTransactions();
+            if (userResponse.equals("4")) manager.viewAllRecords();
 
-            if (userResponse.equals("5")) manager.clearAllTransactions();
+            if (userResponse.equals("5")) manager.clearAllRecords();
 
         } while (!userResponse.equalsIgnoreCase("exit"));
         scanner.close();
