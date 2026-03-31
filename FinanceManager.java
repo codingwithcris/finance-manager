@@ -42,10 +42,10 @@ class Transaction {
 
 class IncomeTransaction extends Transaction {
     public IncomeTransaction(String category, double amount) {
-        this.category = category;
-        this.amount = amount;
+        super("Income", category, amount);
     }
 
+    @Override     
     public void displayInfo() {
         System.out.printf(
             "Income - %s: $%.2f%n",  
@@ -57,10 +57,10 @@ class IncomeTransaction extends Transaction {
 
 class ExpenseTransaction extends Transaction {
     public ExpenseTransaction(String category, double amount) {
-        this.category = category;
-        this.amount = amount;
+        super("Expense", category, amount);
     }
 
+    @Override
     public void displayInfo() {
         System.out.printf(
             "Expense - %s: $%.2f%n",  
@@ -71,18 +71,14 @@ class ExpenseTransaction extends Transaction {
 }
 
 class FinanceManager {
-    private double balance;
-    private ArrayList<IncomeTransaction> incomeRecords;
-    private ArrayList<ExpenseTransaction> expenseRecords;
+    private ArrayList<Transaction> transactions;
 
     public FinanceManager() {
-        this.balance = 0;
-        incomeRecords = new ArrayList<>();
-        expenseRecords = new ArrayList<>();
+        transactions = new ArrayList<>();
     } 
 
-    public void addIncome(IncomeTransaction income) {
-        incomeRecords.add(income);
+    public void addIncome(Transaction income) {
+        transactions.add(income);
         System.out.printf(
             "Income added: %s - $%.2f%n", 
             income.getCategory(), 
@@ -90,8 +86,8 @@ class FinanceManager {
         );
     }
 
-    public void addExpense(ExpenseTransaction expense) {
-        expenseRecords.add(expense);
+    public void addExpense(Transaction expense) {
+        transactions.add(expense);
         System.out.printf(
             "Expense added: %s - $%.2f%n", 
             expense.getCategory(), 
@@ -99,73 +95,45 @@ class FinanceManager {
         );
     }
 
-    public void calculateBalance() {
-        double totalIncome = getTotalIncome();
-        double totalExpenses = getTotalExpenses();
-        
-        this.balance = totalIncome - totalExpenses;
-    }
-
     public void clearAllRecords() {
-        incomeRecords.clear();
-        expenseRecords.clear();
-        calculateBalance();
+        transactions.clear();
         System.out.println("All records have been cleared");
     }
     
     public void displaySummary() {
-        System.out.println("------ SUMMARY ------");
-        System.out.printf("Balance: $%.2f%n", getBalance());
-        System.out.printf("Income: $%.2f%n", getTotalIncome());
-        System.out.printf("Expenses: $%.2f%n", getTotalExpenses());
-    }
-
-    public void displayAllRecords() {
-        System.out.println("------ INCOME ------");
-        if (incomeRecords.size() == 0) {
-            System.out.println("None");
-        } else {
-            for (int i = 0; i < incomeRecords.size(); i++) {
-                IncomeTransaction income = incomeRecords.get(i);
-                System.out.print(i + 1 + ". ");
-                income.displayInfo();
-            }
-        }
-
-        System.out.println("------ EXPENSES ------");
-        if (expenseRecords.size() == 0) {
-            System.out.println("None");
-        } else {
-            for (int i = 0; i < expenseRecords.size(); i++) {
-                ExpenseTransaction expense = expenseRecords.get(i);
-                System.out.print(i + 1 + ". ");
-                expense.displayInfo();
-            }
-        }
-    }
-
-    public double getTotalIncome() {
         double totalIncome = 0;
-
-        for (IncomeTransaction income : incomeRecords) {
-            totalIncome += income.getAmount();
-        }
-
-        return totalIncome;
-    }
-
-    public double getTotalExpenses() {
         double totalExpenses = 0;
 
-        for (ExpenseTransaction expense : expenseRecords) {
-            totalExpenses += expense.getAmount();
+        for (Transaction transaction: transactions) {
+            if (transaction.getType().equals("Expense")) {
+                totalExpenses += transaction.getAmount();
+            } else if (transaction.getType().equals("Income")) {
+                totalIncome += transaction.getAmount();
+            }
         }
 
-        return totalExpenses;
+        double balance = totalIncome - totalExpenses;
+
+        System.out.println("------ SUMMARY ------");
+        System.out.printf("Balance: $%.2f%n", balance);
+        System.out.printf("Income: $%.2f%n", totalIncome);
+        System.out.printf("Expenses: $%.2f%n", totalExpenses);
     }
 
-    public double getBalance() {
-        return this.balance;
+    public void displayTransactionsByType(String type) {
+        boolean transactionFound = false;
+        
+        System.out.println("----- " + type.toUpperCase() + " -----");
+        for (Transaction transaction : transactions) {
+            if (transaction.getType().equals(type)) {
+                transaction.displayInfo();
+                transactionFound = true;
+            } 
+        }
+
+        if (!transactionFound) {
+            System.out.println("No " + type.toLowerCase() + " transactions found.");
+        }
     }
 
     public static void main(String[] args) {
@@ -180,7 +148,7 @@ class FinanceManager {
             System.out.println("1. Add income");
             System.out.println("2. Add expense");
             System.out.println("3. View balance");
-            System.out.println("4. View all records");
+            System.out.println("4. View by type");
             System.out.println("5. Clear all records");
             System.out.print("Select an option or enter 'EXIT': ");
 
@@ -229,7 +197,6 @@ class FinanceManager {
 
                 IncomeTransaction income = new IncomeTransaction(category, amount);
                 manager.addIncome(income);
-                manager.calculateBalance();
                 userResponse = "";
             } else if (userResponse.equals("2")) {
                 System.out.println("Select the expense type:");
@@ -274,12 +241,27 @@ class FinanceManager {
 
                 ExpenseTransaction expense = new ExpenseTransaction(category, amount);
                 manager.addExpense(expense);
-                manager.calculateBalance();
                 userResponse = "";
             } else if (userResponse.equals("3")) {
                 manager.displaySummary();
             } else if (userResponse.equals("4")) {
-                manager.displayAllRecords();
+                System.out.println("Select the type:");
+                System.out.println("1. Income");
+                System.out.println("2. Expense");
+                System.out.print("Enter choice: ");
+
+                userResponse = scanner.nextLine().trim();
+
+                if (userResponse.equals("1")) {
+                    manager.displayTransactionsByType("Income");
+                } else if (userResponse.equals("2")) {
+                    manager.displayTransactionsByType("Expense");
+                } else {
+                    System.out.println("Invalid option. Choose 1 or 2.");
+                    continue;
+                }
+
+                userResponse = "";
             } else if (userResponse.equals("5")) {
                 manager.clearAllRecords();
             } else {
