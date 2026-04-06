@@ -14,8 +14,9 @@ public class Main {
             System.out.println("1. Add income");
             System.out.println("2. Add expense");
             System.out.println("3. View balance");
-            System.out.println("4. View by type");
-            System.out.println("5. Clear all records");
+            System.out.println("4. View income category totals");
+            System.out.println("5. View expense category totals");
+            System.out.println("6. Clear all records");
             System.out.print("Select an option or enter 'EXIT': ");
 
             userResponse = scanner.nextLine().trim();
@@ -111,29 +112,14 @@ public class Main {
             } else if (userResponse.equals("3")) {
                 manager.displaySummary();
             } else if (userResponse.equals("4")) {
-                System.out.println("Select the type:");
-                System.out.println("1. Income");
-                System.out.println("2. Expense");
-                System.out.print("Enter choice: ");
-
-                userResponse = scanner.nextLine().trim();
-
-                if (userResponse.equals("1")) {
-                    manager.displayTransactionsByType("Income");
-                } else if (userResponse.equals("2")) {
-                    manager.displayTransactionsByType("Expense");
-                } else {
-                    System.out.println("Invalid option. Choose 1 or 2.");
-                    continue;
-                }
-
-                userResponse = "";
+                manager.displayIncomeCategoryTotal();
             } else if (userResponse.equals("5")) {
+                manager.displayExpenseCategoryTotal();
+            } else if (userResponse.equals("6")) {
                 manager.clearAllRecords();
             } else {
                 System.out.println("Invalid option. Try again please.");
             }
-
         } while (!userResponse.equalsIgnoreCase("exit"));
         scanner.close();
     }

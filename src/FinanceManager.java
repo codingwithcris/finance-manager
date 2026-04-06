@@ -36,9 +36,9 @@ class FinanceManager {
         double totalExpenses = 0;
 
         for (Transaction transaction: transactions) {
-            if (transaction.getType().equals("Expense")) {
+            if (transaction instanceof ExpenseTransaction) {
                 totalExpenses += transaction.getAmount();
-            } else if (transaction.getType().equals("Income")) {
+            } else if (transaction instanceof IncomeTransaction) {
                 totalIncome += transaction.getAmount();
             }
         }
@@ -51,19 +51,98 @@ class FinanceManager {
         System.out.printf("Expenses: $%.2f%n", totalExpenses);
     }
 
-    public void displayTransactionsByType(String type) {
-        boolean transactionFound = false;
-        
-        System.out.println("----- " + type.toUpperCase() + " -----");
+    public void displayIncomeCategoryTotal() {
+        double totalSalary = 0;
+        double totalGifts = 0;
+        double totalScholarships = 0;
+        double totalFreelance = 0;
+        double totalOther = 0;
+
+
         for (Transaction transaction : transactions) {
-            if (transaction.getType().equals(type)) {
-                transaction.displayInfo();
-                transactionFound = true;
-            } 
+            if (transaction instanceof IncomeTransaction) {
+                String category = transaction.getCategory();
+                double amount = transaction.getAmount();
+
+                if (category.equals("Salary")) {
+                    totalSalary += amount;
+                } else if (category.equals("Gift")) {
+                    totalGifts += amount;
+                } else if (category.equals("Scholarship")) {
+                    totalScholarships += amount;
+                } else if (category.equals("Freelance")) {
+                    totalFreelance += amount;
+                } else {
+                    totalOther += amount;
+                }
+            }
         }
 
-        if (!transactionFound) {
-            System.out.println("No " + type.toLowerCase() + " transactions found.");
+        if (totalSalary > 0) {
+            System.out.println("Total Salary: $" + totalSalary);
+        }
+
+        if (totalGifts > 0) {
+            System.out.println("Total Gifts: $" + totalGifts);
+        }
+
+        if (totalScholarships > 0) {
+            System.out.println("Total Scholarships: $" + totalScholarships);
+        }
+
+        if (totalFreelance > 0) {
+            System.out.println("Total Freelance: $" + totalFreelance);
+        }
+
+        if (totalOther > 0) {
+            System.out.println("Total Other: $" + totalOther);
         }
     }
+
+    public void displayExpenseCategoryTotal() {
+        double totalRent = 0;
+        double totalFood = 0;
+        double totalEntertainment = 0;
+        double totalUtilities = 0;
+        double totalOther = 0;
+
+        for (Transaction transaction : transactions) {
+            if (transaction instanceof ExpenseTransaction) {
+                String category = transaction.getCategory();
+                double amount = transaction.getAmount();
+
+                if (category.equals("Rent")) {
+                    totalRent += amount;
+                } else if (category.equals("Food")) {
+                    totalFood += amount;
+                } else if (category.equals("Entertainment")) {
+                    totalEntertainment += amount;
+                } else if (category.equals("Utilities")) {
+                    totalUtilities += amount;
+                } else {
+                    totalOther += amount;
+                }
+            }
+        }
+
+        if (totalRent > 0) {
+            System.out.println("Total Rent: $" + totalRent);
+        }
+
+        if (totalFood > 0) {
+            System.out.println("Total Food: $" + totalFood);
+        }
+
+        if (totalEntertainment > 0) {
+            System.out.println("Total Entertainment: $" + totalEntertainment);
+        }
+
+        if (totalUtilities > 0) {
+            System.out.println("Total Utilities: $" + totalUtilities);
+        }
+
+        if (totalOther > 0) {
+            System.out.println("Total Other: $" + totalOther);
+        }
+    } 
 }

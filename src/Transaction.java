@@ -1,6 +1,6 @@
 package src;
 
-public class Transaction {
+public abstract class Transaction {
     protected String type;
     protected String category;
     protected double amount;
@@ -11,17 +11,11 @@ public class Transaction {
         this.amount = amount;
     }
 
-    public String getType() {
-        return this.type;
-    }
+    public String getType() { return this.type; }
 
-    public String getCategory() {
-        return this.category;
-    }
+    public String getCategory() { return this.category; }
 
-    public double getAmount() {
-        return this.amount;
-    }
+    public double getAmount() { return this.amount; }
 
     public void displayInfo() {
         System.out.printf(
