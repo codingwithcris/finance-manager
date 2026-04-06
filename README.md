@@ -10,7 +10,6 @@ The application currently runs as a console-based program but it is actively und
 
 ## Features (Current)
 
-nto a **graphical user interface - Add financial transactions
 - Categorize income and expenses
 - Store transaction details (type, category, amount)
 - Demonstrates object-oriented programming concepts
