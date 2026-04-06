@@ -45,7 +45,7 @@ class FinanceManager {
 
         double balance = totalIncome - totalExpenses;
 
-        System.out.println("------ SUMMARY ------");
+        System.out.println("====== SUMMARY ======");
         System.out.printf("Balance: $%.2f%n", balance);
         System.out.printf("Income: $%.2f%n", totalIncome);
         System.out.printf("Expenses: $%.2f%n", totalExpenses);

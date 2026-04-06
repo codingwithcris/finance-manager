@@ -10,7 +10,7 @@ public class Main {
         double amount;
         
         do {
-            System.out.println("------ MENU ------");
+            System.out.println("======= MENU =======");
             System.out.println("1. Add income");
             System.out.println("2. Add expense");
             System.out.println("3. View balance");
@@ -22,7 +22,7 @@ public class Main {
             userResponse = scanner.nextLine().trim();
 
             if (userResponse.equals("1")) {
-                System.out.println("Select the income type:");
+                System.out.println("Select the income category:");
                 System.out.println("1. Salary");
                 System.out.println("2. Gift");
                 System.out.println("3. Scholarship");
@@ -49,7 +49,7 @@ public class Main {
 
                 System.out.print("Enter the amount: ");
                 if (!scanner.hasNextDouble()) {
-                    System.out.println("Invalid amount. Please enter a number");
+                    System.out.println("Invalid amount. Please enter a number.");
                     scanner.nextLine();
                     continue;
                 }
@@ -58,7 +58,7 @@ public class Main {
                 scanner.nextLine();
                 
                 if (amount <= 0) {
-                    System.out.println("The amount cannot be a zero or negative number");
+                    System.out.println("The amount cannot be a zero or negative number.");
                     continue;
                 }
 
@@ -66,7 +66,7 @@ public class Main {
                 manager.addIncome(income);
                 userResponse = "";
             } else if (userResponse.equals("2")) {
-                System.out.println("Select the expense type:");
+                System.out.println("Select the expense category:");
                 System.out.println("1. Rent");
                 System.out.println("2. Food");
                 System.out.println("3. Entertainment");
