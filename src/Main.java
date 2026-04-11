@@ -43,11 +43,11 @@ public class Main {
                 } else if (userResponse.equals("5")) {
                     category = "Other";
                 } else {
-                    System.out.println("Invalid option. Choose (1-5).");
+                    System.out.println("Invalid income category. Choose (1-5).");
                     continue;
                 }
 
-                System.out.print("Enter the amount: ");
+                System.out.print("Enter income amount: ");
                 if (!scanner.hasNextDouble()) {
                     System.out.println("Invalid amount. Please enter a number.");
                     scanner.nextLine();
@@ -87,11 +87,11 @@ public class Main {
                 } else if (userResponse.equals("5")) {
                     category = "Other";
                 } else {
-                    System.out.println("Invalid option: Choose (1-5).");
+                    System.out.println("Invalid expense category: Choose (1-5).");
                     continue;
                 }
 
-                System.out.print("Enter the amount: ");
+                System.out.print("Enter expense amount: ");
                 if (!scanner.hasNextDouble()) {
                     System.out.println("Invalid amount. Please enter a number.");
                     scanner.nextLine();

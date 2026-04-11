@@ -28,7 +28,7 @@ class FinanceManager {
 
     public void clearAllTransactions() {
         transactions.clear();
-        System.out.println("All transactions have been cleared");
+        System.out.println("All transactions have been cleared.");
     }
     
     public void displaySummary() {
