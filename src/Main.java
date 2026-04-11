@@ -10,13 +10,13 @@ public class Main {
         double amount;
         
         do {
-            System.out.println("======= MENU =======");
+            System.out.println("====== MENU ======");
             System.out.println("1. Add income");
             System.out.println("2. Add expense");
             System.out.println("3. View balance");
             System.out.println("4. View income category totals");
             System.out.println("5. View expense category totals");
-            System.out.println("6. Clear all records");
+            System.out.println("6. Clear all transactions");
             System.out.print("Select an option or enter 'EXIT': ");
 
             userResponse = scanner.nextLine().trim();
@@ -116,9 +116,10 @@ public class Main {
             } else if (userResponse.equals("5")) {
                 manager.displayExpenseCategoryTotal();
             } else if (userResponse.equals("6")) {
-                manager.clearAllRecords();
+                manager.clearAllTransactions();
             } else {
-                System.out.println("Invalid option. Try again please.");
+                System.out.println("Invalid menu option. Please try again.");
+                continue;
             }
         } while (!userResponse.equalsIgnoreCase("exit"));
         scanner.close();

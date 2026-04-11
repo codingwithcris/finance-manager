@@ -26,9 +26,9 @@ class FinanceManager {
         );
     }
 
-    public void clearAllRecords() {
+    public void clearAllTransactions() {
         transactions.clear();
-        System.out.println("All records have been cleared");
+        System.out.println("All transactions have been cleared");
     }
     
     public void displaySummary() {
@@ -52,97 +52,110 @@ class FinanceManager {
     }
 
     public void displayIncomeCategoryTotal() {
-        double totalSalary = 0;
-        double totalGifts = 0;
-        double totalScholarships = 0;
-        double totalFreelance = 0;
-        double totalOther = 0;
-
+        double salaryAmount = 0;
+        double giftsAmount = 0;
+        double scholarshipsAmount = 0;
+        double freelanceAmount = 0;
+        double otherAmount = 0;
+        boolean incomeCategoryFound = false;
 
         for (Transaction transaction : transactions) {
             if (transaction instanceof IncomeTransaction) {
                 String category = transaction.getCategory();
                 double amount = transaction.getAmount();
+                incomeCategoryFound = true;
 
                 if (category.equals("Salary")) {
-                    totalSalary += amount;
+                    salaryAmount += amount;
                 } else if (category.equals("Gift")) {
-                    totalGifts += amount;
+                    giftsAmount += amount;
                 } else if (category.equals("Scholarship")) {
-                    totalScholarships += amount;
+                    scholarshipsAmount += amount;
                 } else if (category.equals("Freelance")) {
-                    totalFreelance += amount;
+                    freelanceAmount += amount;
                 } else {
-                    totalOther += amount;
+                    otherAmount += amount;
                 }
             }
         }
 
-        if (totalSalary > 0) {
-            System.out.println("Total Salary: $" + totalSalary);
+        System.out.println("====== INCOME CATEGORY TOTALS ======");
+        if (salaryAmount > 0) {
+            System.out.printf("Salary: $%.2f%n", salaryAmount);
         }
 
-        if (totalGifts > 0) {
-            System.out.println("Total Gifts: $" + totalGifts);
+        if (giftsAmount > 0) {
+            System.out.printf("Gifts: $%.2f%n", giftsAmount);
         }
 
-        if (totalScholarships > 0) {
-            System.out.println("Total Scholarships: $" + totalScholarships);
+        if (scholarshipsAmount > 0) {
+            System.out.printf("Scholarships: $%.2f%n", scholarshipsAmount);
         }
 
-        if (totalFreelance > 0) {
-            System.out.println("Total Freelance: $" + totalFreelance);
+        if (freelanceAmount > 0) {
+            System.out.printf("Freelance: $%.2f%n", freelanceAmount);
         }
 
-        if (totalOther > 0) {
-            System.out.println("Total Other: $" + totalOther);
+        if (otherAmount > 0) {
+            System.out.printf("Other: $%.2f%n", otherAmount);
+        }
+
+        if (!incomeCategoryFound) {
+            System.out.println("No income category transactions found.");
         }
     }
 
     public void displayExpenseCategoryTotal() {
-        double totalRent = 0;
-        double totalFood = 0;
-        double totalEntertainment = 0;
-        double totalUtilities = 0;
-        double totalOther = 0;
+        double rentAmount = 0;
+        double foodAmount = 0;
+        double entertainmentAmount = 0;
+        double utilitiesAmount = 0;
+        double otherAmount = 0;
+        boolean expenseCategoryFound = false;
 
         for (Transaction transaction : transactions) {
             if (transaction instanceof ExpenseTransaction) {
                 String category = transaction.getCategory();
                 double amount = transaction.getAmount();
+                expenseCategoryFound = true;
 
                 if (category.equals("Rent")) {
-                    totalRent += amount;
+                    rentAmount += amount;
                 } else if (category.equals("Food")) {
-                    totalFood += amount;
+                    foodAmount += amount;
                 } else if (category.equals("Entertainment")) {
-                    totalEntertainment += amount;
+                    entertainmentAmount += amount;
                 } else if (category.equals("Utilities")) {
-                    totalUtilities += amount;
+                    utilitiesAmount += amount;
                 } else {
-                    totalOther += amount;
+                    otherAmount += amount;
                 }
             }
         }
 
-        if (totalRent > 0) {
-            System.out.println("Total Rent: $" + totalRent);
+        System.out.println("====== EXPENSE CATEGORY TOTALS ======");
+        if (rentAmount > 0) {
+            System.out.printf("Rent: $%.2f%n", rentAmount);
         }
 
-        if (totalFood > 0) {
-            System.out.println("Total Food: $" + totalFood);
+        if (foodAmount > 0) {
+            System.out.printf("Food: $%.2f%n", foodAmount);
         }
 
-        if (totalEntertainment > 0) {
-            System.out.println("Total Entertainment: $" + totalEntertainment);
+        if (entertainmentAmount > 0) {
+            System.out.printf("Entertainment: $%.2f%n", entertainmentAmount);
         }
 
-        if (totalUtilities > 0) {
-            System.out.println("Total Utilities: $" + totalUtilities);
+        if (utilitiesAmount > 0) {
+            System.out.printf("Utilities: $%.2f%n", utilitiesAmount);
         }
 
-        if (totalOther > 0) {
-            System.out.println("Total Other: $" + totalOther);
+        if (otherAmount > 0) {
+            System.out.printf("Other: $%.2f%n", otherAmount);
+        }
+
+        if (!expenseCategoryFound) {
+            System.out.println("No expense category transactions found.");
         }
     } 
 }
