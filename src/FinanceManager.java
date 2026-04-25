@@ -10,27 +10,27 @@ class FinanceManager {
 
     public void addIncome(Transaction income) {
         transactions.add(income);
-        System.out.printf(
-            "Income added: %s - $%.2f%n", 
-            income.getCategory(), 
-            income.getAmount()
-        );
+        System.out.println("Income added successfully.");
     }
 
     public void addExpense(Transaction expense) {
         transactions.add(expense);
-        System.out.printf(
-            "Expense added: %s - $%.2f%n", 
-            expense.getCategory(), 
-            expense.getAmount()
-        );
+        System.out.println("Expense added successfully.");
     }
 
     public void clearAllTransactions() {
         transactions.clear();
         System.out.println("All transactions have been cleared.");
     }
-    
+  
+    public void validateAmount(double amount) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException(
+                "The amount cannot be negative number or zero."
+            );
+        }
+    }
+
     public void displaySummary() {
         double totalIncome = 0;
         double totalExpenses = 0;

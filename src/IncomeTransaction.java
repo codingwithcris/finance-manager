@@ -8,9 +8,10 @@ public class IncomeTransaction extends Transaction {
     @Override     
     public void displayInfo() {
         System.out.printf(
-            "Income - %s: $%.2f%n",  
-            this.category, 
-            this.amount
+            "%s - %s: $%.2f%n",  
+            getType(),
+            getCategory(),
+            getAmount()
         );
     }
 }

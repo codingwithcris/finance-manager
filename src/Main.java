@@ -1,4 +1,5 @@
 package src;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Main {
@@ -7,7 +8,7 @@ public class Main {
         FinanceManager manager = new FinanceManager();
         String userResponse;  
         String category;
-        double amount;
+        double amount = 0;
         
         do {
             System.out.println("====== MENU ======");
@@ -48,17 +49,15 @@ public class Main {
                 }
 
                 System.out.print("Enter income amount: ");
-                if (!scanner.hasNextDouble()) {
-                    System.out.println("Invalid amount. Please enter a number.");
+                try {   
+                    amount = scanner.nextDouble();
                     scanner.nextLine();
+                    manager.validateAmount(amount);
+                } catch (InputMismatchException err) {
+                    System.out.println("Please enter a number for the amount.");
                     continue;
-                }
-                    
-                amount = scanner.nextDouble();
-                scanner.nextLine();
-                
-                if (amount <= 0) {
-                    System.out.println("The amount cannot be a zero or negative number.");
+                } catch (IllegalArgumentException err) {
+                    System.out.println(err.getMessage());
                     continue;
                 }
 
@@ -92,17 +91,15 @@ public class Main {
                 }
 
                 System.out.print("Enter expense amount: ");
-                if (!scanner.hasNextDouble()) {
-                    System.out.println("Invalid amount. Please enter a number.");
+                try {   
+                    amount = scanner.nextDouble();
                     scanner.nextLine();
+                    manager.validateAmount(amount);
+                } catch (InputMismatchException err) {
+                    System.out.println("Please enter a number for the amount.");
                     continue;
-                }
-                    
-                amount = scanner.nextDouble();
-                scanner.nextLine();
-                
-                if (amount <= 0) {
-                    System.out.println("The amount cannot be a zero or negative number.");
+                } catch (IllegalArgumentException err) {
+                    System.out.println(err.getMessage());
                     continue;
                 }
 
