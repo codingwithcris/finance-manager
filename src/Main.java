@@ -4,12 +4,14 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
+        Scanner inputScanner = new Scanner(System.in);
         FinanceManager manager = new FinanceManager();
         String userResponse;  
         String category;
         double amount = 0;
         
+        manager.loadTransactions();
+
         do {
             System.out.println("====== MENU ======");
             System.out.println("1. Add income");
@@ -17,10 +19,10 @@ public class Main {
             System.out.println("3. View balance");
             System.out.println("4. View income category totals");
             System.out.println("5. View expense category totals");
-            System.out.println("6. Clear all transactions");
+            System.out.println("6. Clear transactions history");
             System.out.print("Select an option or enter 'EXIT': ");
 
-            userResponse = scanner.nextLine().trim();
+            userResponse = inputScanner.nextLine().trim();
 
             if (userResponse.equals("1")) {
                 System.out.println("Select the income category:");
@@ -31,7 +33,7 @@ public class Main {
                 System.out.println("5. Other");
                 System.out.print("Choose (1-5): ");
 
-                userResponse = scanner.nextLine().trim();
+                userResponse = inputScanner.nextLine().trim();
 
                 if (userResponse.equals("1")) {
                     category = "Salary";
@@ -50,19 +52,18 @@ public class Main {
 
                 System.out.print("Enter income amount: ");
                 try {   
-                    amount = scanner.nextDouble();
-                    scanner.nextLine();
+                    amount = inputScanner.nextDouble();
+                    inputScanner.nextLine();
                     manager.validateAmount(amount);
-                } catch (InputMismatchException err) {
+                } catch (InputMismatchException e) {
                     System.out.println("Please enter a number for the amount.");
                     continue;
-                } catch (IllegalArgumentException err) {
-                    System.out.println(err.getMessage());
+                } catch (IllegalArgumentException e) {
+                    System.out.println(e.getMessage());
                     continue;
                 }
 
-                IncomeTransaction income = new IncomeTransaction(category, amount);
-                manager.addIncome(income);
+                manager.addIncome(new IncomeTransaction(category, amount));
                 userResponse = "";
             } else if (userResponse.equals("2")) {
                 System.out.println("Select the expense category:");
@@ -73,7 +74,7 @@ public class Main {
                 System.out.println("5. Other");
                 System.out.print("Choose (1-5): ");
 
-                userResponse = scanner.nextLine().trim();
+                userResponse = inputScanner.nextLine().trim();
 
                 if (userResponse.equals("1")) {
                     category = "Rent";
@@ -92,19 +93,18 @@ public class Main {
 
                 System.out.print("Enter expense amount: ");
                 try {   
-                    amount = scanner.nextDouble();
-                    scanner.nextLine();
+                    amount = inputScanner.nextDouble();
+                    inputScanner.nextLine();
                     manager.validateAmount(amount);
-                } catch (InputMismatchException err) {
+                } catch (InputMismatchException e) {
                     System.out.println("Please enter a number for the amount.");
                     continue;
-                } catch (IllegalArgumentException err) {
-                    System.out.println(err.getMessage());
+                } catch (IllegalArgumentException e) {
+                    System.out.println(e.getMessage());
                     continue;
                 }
 
-                ExpenseTransaction expense = new ExpenseTransaction(category, amount);
-                manager.addExpense(expense);
+                manager.addExpense(new ExpenseTransaction(category, amount));
                 userResponse = "";
             } else if (userResponse.equals("3")) {
                 manager.displaySummary();
@@ -113,12 +113,12 @@ public class Main {
             } else if (userResponse.equals("5")) {
                 manager.displayExpenseCategoryTotal();
             } else if (userResponse.equals("6")) {
-                manager.clearAllTransactions();
+                manager.clearTransactionsHistory();
             } else {
                 System.out.println("Invalid menu option. Please try again.");
                 continue;
             }
         } while (!userResponse.equalsIgnoreCase("exit"));
-        scanner.close();
+        inputScanner.close();
     }
 }
