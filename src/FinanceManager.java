@@ -36,7 +36,7 @@ class FinanceManager {
         double totalIncome = 0;
         double totalExpenses = 0;
         
-        for (Transaction transaction: transactions) {
+        for (Transaction transaction : transactions) {
             if (transaction instanceof ExpenseTransaction) {
                 totalExpenses += transaction.getAmount();
             } else if (transaction instanceof IncomeTransaction) {
@@ -167,26 +167,25 @@ class FinanceManager {
             fileScanner = new Scanner(new File(FILE_PATH));
 
             while (fileScanner.hasNextLine()) {
-                    String line = fileScanner.nextLine();
-                    String[] transactionFields = line.split(",");
-                    String typeField = transactionFields[0];
-                    String categoryField = transactionFields[1];
-                    String amountStr = transactionFields[2];
-                    double amountField = Double.parseDouble(amountStr);
-                    
-                    if (typeField.equals("Income")) {
-                        transactions.add(new IncomeTransaction(categoryField, amountField));
-                    } else if (typeField.equals("Expense")) {
-                        transactions.add(new ExpenseTransaction(categoryField, amountField));
-                    }
-                }
-            } catch (FileNotFoundException e) {
-                System.out.println("File not found: " + FILE_PATH);
-            } finally {
-                if (fileScanner != null) {
-                    fileScanner.close();
+                String line = fileScanner.nextLine();
+                String[] transactionDetails = line.split(",");
+                String type = transactionDetails[0];
+                String category = transactionDetails[1];
+                double amount = Double.parseDouble(transactionDetails[2]);
+                
+                if (type.equals("Income")) {
+                    transactions.add(new IncomeTransaction(category, amount));
+                } else if (type.equals("Expense")) {
+                    transactions.add(new ExpenseTransaction(category, amount));
                 }
             }
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found: " + FILE_PATH);
+        } finally {
+            if (fileScanner != null) {
+                fileScanner.close();
+            }
+        }
     }
 
     public void saveTransaction(Transaction transaction) {
@@ -201,7 +200,7 @@ class FinanceManager {
                 transaction.getAmount()
             );
         } catch (IOException e) {
-            System.out.println(e);
+            System.out.println("Failed to save transactions: " + e.getMessage());
         } finally {
             if (fileWriter != null) {
                 fileWriter.close();
