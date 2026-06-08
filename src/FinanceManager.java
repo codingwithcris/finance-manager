@@ -4,82 +4,17 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Scanner;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.layout.HBox;
 
 class FinanceManager {
-    private ArrayList<Transaction> transactions;
     private static final String FILE_PATH = "data/transactions.txt";
     private HBox statusBar = new HBox(4);
     private Label statusTypeLabel = new Label("");
     private Label statusMessageLabel = new Label("");
-
-    public FinanceManager() {
-        transactions = new ArrayList<>();
-    } 
-
-    public void addIncome(Transaction income) {
-        transactions.add(income);
-        saveTransaction(income);
-        System.out.println("Income added successfully.");
-    }
-
-    public void addExpense(Transaction expense) {
-        transactions.add(expense);
-        saveTransaction(expense);
-        System.out.println("Expense added successfully.");
-    }
-
-    public void loadTransactions() {
-        Scanner fileScanner = null;
-
-        try {
-            fileScanner = new Scanner(new File(FILE_PATH));
-
-            while (fileScanner.hasNextLine()) {
-                String line = fileScanner.nextLine();
-                String[] transactionDetails = line.split(",");
-                String type = transactionDetails[0];
-                String category = transactionDetails[1];
-                double amount = Double.parseDouble(transactionDetails[2]);
-                
-                if (type.equals("Income")) {
-                    transactions.add(new IncomeTransaction(category, amount));
-                } else if (type.equals("Expense")) {
-                    transactions.add(new ExpenseTransaction(category, amount));
-                }
-            }
-        } catch (FileNotFoundException e) {
-            System.out.println("File not found: " + FILE_PATH);
-        } finally {
-            if (fileScanner != null) {
-                fileScanner.close();
-            }
-        }
-    }
-
-    public void saveTransaction(Transaction transaction) {
-        PrintWriter fileWriter = null;
-
-        try {
-            fileWriter = new PrintWriter(new FileWriter(FILE_PATH, true));
-            fileWriter.printf(
-                "%s, %s, %.2f%n",  
-                transaction.getType(),
-                transaction.getCategory(),
-                transaction.getAmount()
-            );
-        } catch (IOException e) {
-            System.out.println("Failed to save transactions: " + e.getMessage());
-        } finally {
-            if (fileWriter != null) {
-                fileWriter.close();
-            }
-        }
-    }
 
     public void validateAmount(double amount) {
         if (amount == 0) {
@@ -123,4 +58,46 @@ class FinanceManager {
         statusTypeLabel.setText("");
         statusMessageLabel.setText("");
     }
+
+    public void loadTransactions(TextArea transactionLog) {
+        StringBuilder sb = new StringBuilder();
+        int i = 0;
+
+        try (Scanner fileScanner = new Scanner(new File(FILE_PATH))) {
+           while (fileScanner.hasNextLine()) {
+                String line = fileScanner.nextLine();
+                String[] transactionParts = line.split("\\,");
+
+                String amount = transactionParts[0];
+                String type = transactionParts[1];
+                String category = transactionParts[2];
+                String description = transactionParts[3];
+                
+                sb.append(i += 1)
+                  .append(". Amount: ").append(amount)
+                  .append(" Type: ").append(type)
+                  .append(" Category: ").append(category)
+                  .append(" description: ").append(description)
+                  .append("\n");
+           }
+
+           transactionLog.setText(sb.toString());
+        } catch (FileNotFoundException e) {
+            showStatusMessage(
+                "ERROR", 
+                "cannot load transactions because file does not exist"
+            );
+        }   
+    }
+
+    public void saveTransaction(String transaction) {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(FILE_PATH, true))) {
+            writer.println(transaction);
+        } catch (IOException e) {
+            showStatusMessage(
+                "ERROR", 
+                "cannot save transaction into file"
+            );
+        } 
+    }   
 }

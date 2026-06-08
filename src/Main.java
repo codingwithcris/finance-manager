@@ -156,16 +156,6 @@ public class Main extends Application {
             "-fx-padding: 7 8;"
         );
         descriptionField.setFont(mozillaTextRegular(11));
-        descriptionField.textProperty().addListener((obs, oldValue, newValue) -> {
-            if (newValue.length() > 75) {
-                manager.showStatusMessage(
-                    "ERROR", 
-                    "The description cannot exceed 75 characters"
-                );
-            } else {
-                manager.hideStatusMessage();
-            }
-        });
 
         // COMBOBOX
         ComboBox<String> categoryDropDown  = new ComboBox<>();
@@ -297,11 +287,12 @@ public class Main extends Application {
             .or(categoryDropDown.itemsProperty().isNull())
             .or(descriptionField.textProperty().isEmpty())
         );
-        insertButton.setOnAction(event -> {
-            manager.hideStatusMessage();
+        insertButton.setOnAction(event -> {          
+            manager.hideStatusMessage();    
             
+            Toggle selectedToggle = transactionTypeGroup.getSelectedToggle();
+            String typeValue = ((RadioButton) selectedToggle).getText();    
             String amountStr = amountField.getText().trim();
-            Toggle typeValue = transactionTypeGroup.getSelectedToggle();
             String categoryValue = categoryDropDown.getValue();
             String descriptionValue = descriptionField.getText().trim();
 
@@ -313,12 +304,41 @@ public class Main extends Application {
                 return;
             }
 
+            if (descriptionValue.length() > 75) {
+                manager.showStatusMessage(
+                    "ERROR", 
+                    "Description cannot exceed 75 characters"
+                );
+                return;
+            }
+
             try {
                 Double amountValue = Double.parseDouble(amountStr);
                 manager.validateAmount(amountValue);
+                System.out.println(amountStr.formatted(".2f"));
+            } catch (NumberFormatException e) {
+                manager.showStatusMessage("ERROR", "Invalid number");
             } catch (IllegalArgumentException e) {
                 manager.showStatusMessage("ERROR", e.getMessage());
-            }
+            } 
+
+            String transaction = 
+                amountStr + "," +
+                typeValue + "," +
+                categoryValue + "," +
+                descriptionValue;
+
+            manager.showStatusMessage(
+                "SUCCESSFUL", 
+                "Transaction submitted"
+            );
+            manager.saveTransaction(transaction);
+            manager.loadTransactions(transactionLog);
+
+            // amountField.clear();
+            // transactionTypeGroup.selectToggle(null);
+            // categoryDropDown.getSelectionModel().clearSelection();
+            // descriptionField.clear();
         });
 
         Button clearFormButton = new Button("Clear Form");
@@ -329,6 +349,7 @@ public class Main extends Application {
         );
         clearFormButton.setFont(mozillaTextBold(12));
         clearFormButton.setOnAction(event -> {
+            manager.hideStatusMessage();
             amountField.clear();
             transactionTypeGroup.selectToggle(null);
             categoryDropDown.getSelectionModel().clearSelection();
@@ -407,6 +428,8 @@ public class Main extends Application {
             header,
             body
         );
+
+        manager.loadTransactions(transactionLog);
 
         stage.setScene(new Scene(root, WIDTH, HEIGHT));
         stage.setTitle("Finance Manager");
