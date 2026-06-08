@@ -1,4 +1,6 @@
 package src;
+// import java.io.FileWriter;
+// import java.io.PrintWriter;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.stage.Stage;
@@ -8,7 +10,7 @@ import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 
 public class Main extends Application {
-    private static final int WIDTH = 500;
+    private static final int WIDTH = 600;
     private static final int HEIGHT = 720;
     public static void main(String[] args) {
         launch(args);
@@ -30,6 +32,8 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) {
+        FinanceManager manager = new FinanceManager();
+
         // TEXT
         Label balanceAmount = new Label("$0.00");
         balanceAmount.setStyle("-fx-text-fill: #ffffff;");
@@ -63,18 +67,18 @@ public class Main extends Application {
         descriptionLabel.setStyle("-fx-text-fill: #ffffff;");
         descriptionLabel.setFont(mozillaTextRegular(14));
 
-        // Inputs
+        // INPUTS
         TextArea transactionLog = new TextArea();
         transactionLog.setEditable(false);
         transactionLog.setPromptText("No recent activity ...");
         transactionLog.setPrefHeight(200);
-        transactionLog.setMaxWidth(460);
+        transactionLog.setMaxWidth(580);
         transactionLog.setStyle("-fx-background-color: #ececec;");
         transactionLog.setFont(mozillaTextRegular(14));
 
         TextField filterCategoryField = new TextField();
         filterCategoryField.setPromptText("Filter by category");
-        filterCategoryField.setPrefWidth(180);
+        filterCategoryField.setPrefWidth(160);
         filterCategoryField.setStyle(
             "-fx-background-radius: 4;" +
             "-fx-border-radius: 4;" +
@@ -82,10 +86,15 @@ public class Main extends Application {
             "-fx-padding: 7 8;"
         );
         filterCategoryField.setFont(mozillaTextRegular(11));
+        filterCategoryField.textProperty().addListener((obs, oldValue, newValue) -> {
+            if (!newValue.matches("[a-zA-Z]*")) {
+                filterCategoryField.setText(oldValue);
+            }
+        });
 
         TextField filterAmountField = new TextField();
         filterAmountField.setPromptText("Filter by amount");
-        filterAmountField.setPrefWidth(180);
+        filterAmountField.setPrefWidth(160);
         filterAmountField.setStyle(
             "-fx-background-radius: 4;" +
             "-fx-border-radius: 4;" +
@@ -93,10 +102,15 @@ public class Main extends Application {
             "-fx-padding: 7 8;"
         );
         filterAmountField.setFont(mozillaTextRegular(11));
+        filterAmountField.textProperty().addListener((obs, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*(\\.\\d{0,2})?")) {
+                filterAmountField.setText(oldValue);
+            }
+        });
 
         TextField amountField = new TextField();
         amountField.setPromptText("0.00");
-        amountField.setMaxWidth(280);
+        amountField.setMaxWidth(380);
         amountField.setStyle(
             "-fx-background-radius: 4;" +
             "-fx-border-radius: 4;" +
@@ -104,12 +118,37 @@ public class Main extends Application {
             "-fx-padding: 7 8;"
         );
         amountField.setFont(mozillaTextRegular(11));
+        amountField.textProperty().addListener((obs, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*(\\.\\d{0,2})?")) {
+                amountField.setText(oldValue);
+                manager.showStatusMessage(
+                    "ERROR", 
+                    "The amount cannot contain letters or symbols"
+                );
+            }            
+            
+            if (newValue.contains(".")) {
+                String[] amountParts = newValue.split("\\.");                
+                if (amountParts.length > 1) {
+                    String cents = amountParts[1];
+                    if (cents.length() > 2) {
+                        manager.showStatusMessage(
+                            "ERROR", 
+                            "The cents cannot exceed two decimal places"
+                        );
+                    } else {
+                        manager.hideStatusMessage();
+                    }
+                }
+            }
+
+        });
 
         TextField descriptionField = new TextField();
         descriptionField.setPromptText(
             "e.g. Groceries, books, transportation"
         );
-        descriptionField.setMaxWidth(280);
+        descriptionField.setMaxWidth(380);
         descriptionField.setStyle(
             "-fx-background-radius: 4;" +
             "-fx-border-radius: 4;" +
@@ -117,25 +156,38 @@ public class Main extends Application {
             "-fx-padding: 7 8;"
         );
         descriptionField.setFont(mozillaTextRegular(11));
-        
-        // ComboBox
-        ComboBox<String> categoryDropDown  = new ComboBox<>();
-        categoryDropDown.getItems().addAll(
-            "Salary",
-            "Gift",
-            "Freelance",
-            "Scholarship",
-            "Rent",
-            "Food",
-            "Utilities",
-            "Entertainment",
-            "Other"
-        );
-        categoryDropDown.setStyle(
-            "-fx-background-color: #ececec;"
-        );
+        descriptionField.textProperty().addListener((obs, oldValue, newValue) -> {
+            if (newValue.length() > 75) {
+                manager.showStatusMessage(
+                    "ERROR", 
+                    "The description cannot exceed 75 characters"
+                );
+            } else {
+                manager.hideStatusMessage();
+            }
+        });
 
-        /* BUTTONS */
+        // COMBOBOX
+        ComboBox<String> categoryDropDown  = new ComboBox<>();
+        categoryDropDown.setStyle(
+            "-fx-background-color: #ececec;" +
+            "-fx-padding: 2"
+        );
+        categoryDropDown.setPrefWidth(140);
+
+        ComboBox<String> inequalityDropDown = new ComboBox<>();
+        inequalityDropDown.getItems().addAll(
+            "Is less than",
+            "Exactly",
+            "Is greater than"
+        );
+        inequalityDropDown.setStyle(
+            "-fx-background-color: #ececec;" +
+            "-fx-padding: 1;"
+        );
+        inequalityDropDown.setValue("Exactly");
+
+        // BUTTONS 
         Button viewAllButton = new Button("All");
         viewAllButton.setStyle(
             "-fx-background-radius: 14;" + 
@@ -176,6 +228,60 @@ public class Main extends Application {
         );
         searchButton.setFont(mozillaTextBold(12));
 
+        ToggleGroup transactionTypeGroup = new ToggleGroup();
+
+        RadioButton incomeRadioButton = new RadioButton("Income");
+        incomeRadioButton.setToggleGroup(transactionTypeGroup);
+        incomeRadioButton.setStyle(
+            "-fx-text-fill: #ffffff;" +
+            "-fx-border-width: 1;" + 
+            "-fx-border-color: #ececec;" +
+            "-fx-padding:  7 26 7 8;" +
+            "-fx-background-radius: 4;" +
+            "-fx-border-radius: 4;"
+        );
+        incomeRadioButton.setFont(mozillaTextRegular(12));
+
+        RadioButton expenseRadioButton = new RadioButton("Expense");
+        expenseRadioButton.setToggleGroup(transactionTypeGroup);
+        expenseRadioButton.setStyle(
+            "-fx-text-fill: #ffffff;" +
+            "-fx-border-width: 1;" + 
+            "-fx-border-color: #ececec;" +
+            "-fx-padding:  7 26 7 8;" +
+            "-fx-background-radius: 4;" +
+            "-fx-border-radius: 4;"
+        );
+        expenseRadioButton.setFont(mozillaTextRegular(12));
+        
+        // 
+        transactionTypeGroup.selectedToggleProperty().addListener((obs, oldValue, newValue) -> {
+            categoryDropDown.getItems().clear();
+            if (newValue == incomeRadioButton) {
+                categoryDropDown.getItems().addAll(
+                    "Salary",
+                    "Gift",
+                    "Freelance",
+                    "Scholarship"
+                );
+                categoryDropDown.setValue("Salary");
+            } else if (newValue == expenseRadioButton) {
+                categoryDropDown.getItems().addAll(
+                    "Rent",
+                    "Food",
+                    "Utilities",
+                    "Entertainment",
+                    "Memberships",
+                    "Pet care"
+                );
+                categoryDropDown.setValue("Rent");
+            }
+        });
+
+        categoryDropDown.disableProperty().bind(
+            transactionTypeGroup.selectedToggleProperty().isNull()
+        );
+
         Button insertButton = new Button("Insert");
         insertButton.setStyle(
             "-fx-background-radius: 4;" + 
@@ -185,43 +291,62 @@ public class Main extends Application {
             "-fx-padding: 6 20;"
         );
         insertButton.setFont(mozillaTextBold(12));
+        insertButton.disableProperty().bind(
+            amountField.textProperty().isEmpty()
+            .or(transactionTypeGroup.selectedToggleProperty().isNull())
+            .or(categoryDropDown.itemsProperty().isNull())
+            .or(descriptionField.textProperty().isEmpty())
+        );
+        insertButton.setOnAction(event -> {
+            manager.hideStatusMessage();
+            
+            String amountStr = amountField.getText().trim();
+            Toggle typeValue = transactionTypeGroup.getSelectedToggle();
+            String categoryValue = categoryDropDown.getValue();
+            String descriptionValue = descriptionField.getText().trim();
 
-        Button clearAllButton = new Button("Clear All");
-        clearAllButton.setStyle(
+            if (descriptionValue.isEmpty()) {
+                manager.showStatusMessage(
+                    "ERROR", 
+                    "Description field cannot be blank"
+                );
+                return;
+            }
+
+            try {
+                Double amountValue = Double.parseDouble(amountStr);
+                manager.validateAmount(amountValue);
+            } catch (IllegalArgumentException e) {
+                manager.showStatusMessage("ERROR", e.getMessage());
+            }
+        });
+
+        Button clearFormButton = new Button("Clear Form");
+        clearFormButton.setStyle(
             "-fx-background-color: transparent;" +
             "-fx-text-fill: #ffffff;" + 
             "-fx-padding: 6 0;"
         );
-        clearAllButton.setFont(mozillaTextBold(12));
+        clearFormButton.setFont(mozillaTextBold(12));
+        clearFormButton.setOnAction(event -> {
+            amountField.clear();
+            transactionTypeGroup.selectToggle(null);
+            categoryDropDown.getSelectionModel().clearSelection();
+            descriptionField.clear();
+        });
 
-        ToggleGroup transactionTypeGroup = new ToggleGroup();
-        RadioButton incomeRadioButton = new RadioButton("Income");
-        incomeRadioButton.setToggleGroup(transactionTypeGroup);
-        incomeRadioButton.setStyle("-fx-text-fill: #ffffff");
-        incomeRadioButton.setFont(mozillaTextRegular(12));
-
-        RadioButton expenseRadioButton = new RadioButton("Expense");
-        expenseRadioButton.setToggleGroup(transactionTypeGroup);
-        expenseRadioButton.setStyle("-fx-text-fill: #ffffff");
-        expenseRadioButton.setFont(mozillaTextRegular(12));
-        
-        // LAYOUT
-        VBox root = new VBox(20);
-        root.setStyle(
-            "-fx-background-color: #2f466b;" +
-            "-fx-padding: 20;"
-        );
-        
+        // LAYOUT        
         VBox header = new VBox(5);
+        header.setStyle("-fx-padding: 18 0 0 18;");
         header.getChildren().addAll(
-            balanceLabel,
-            balanceAmount
+            balanceLabel, balanceAmount
         );
 
         HBox controlWrapper = new HBox(10);
         controlWrapper.getChildren().addAll(
             filterCategoryField,
             filterAmountField,
+            inequalityDropDown,
             searchButton
         );
 
@@ -241,19 +366,17 @@ public class Main extends Application {
             viewButtonsWrapper
         );
 
-        HBox radioButtonGroup = new HBox(10);
+        HBox radioButtonGroup = new HBox(8);
         radioButtonGroup.getChildren().addAll(
-            incomeRadioButton,
-            expenseRadioButton
+            incomeRadioButton, expenseRadioButton
         );
 
         VBox categoryGroup = new VBox(10);
         categoryGroup.getChildren().addAll(
-            categoryLabel,
-            categoryDropDown
+            categoryLabel, categoryDropDown
         );
 
-        HBox formGroup = new HBox(15);
+        HBox formGroup = new HBox(18);
         formGroup.getChildren().addAll(
             new VBox(10, typeLabel, radioButtonGroup),
             categoryGroup
@@ -267,16 +390,20 @@ public class Main extends Application {
             formGroup,
             descriptionLabel,
             descriptionField,
-            new HBox(12, insertButton, clearAllButton)
+            new HBox(12, insertButton, clearFormButton)
         );
 
         VBox body = new VBox(25);
+        body.setStyle("-fx-padding: 19;");
         body.getChildren().addAll(
             transactionContainer,
             formContainer
         );
 
+        VBox root = new VBox();
+        root.setStyle("-fx-background-color: #2f466b;");
         root.getChildren().addAll(
+            manager.createStatusBar(),
             header,
             body
         );
