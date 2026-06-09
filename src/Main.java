@@ -1,6 +1,4 @@
 package src;
-// import java.io.FileWriter;
-// import java.io.PrintWriter;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.stage.Stage;
@@ -68,14 +66,6 @@ public class Main extends Application {
         descriptionLabel.setFont(mozillaTextRegular(14));
 
         // INPUTS
-        TextArea transactionLog = new TextArea();
-        transactionLog.setEditable(false);
-        transactionLog.setPromptText("No recent activity ...");
-        transactionLog.setPrefHeight(200);
-        transactionLog.setMaxWidth(580);
-        transactionLog.setStyle("-fx-background-color: #ececec;");
-        transactionLog.setFont(mozillaTextRegular(14));
-
         TextField filterCategoryField = new TextField();
         filterCategoryField.setPromptText("Filter by category");
         filterCategoryField.setPrefWidth(160);
@@ -187,6 +177,11 @@ public class Main extends Application {
             "-fx-padding: 6 18;"
         );
         viewAllButton.setFont(mozillaTextBold(12));
+        viewAllButton.setOnAction(event -> {
+            manager.filterTransactionsByType(
+                viewAllButton.getText()
+            );
+        });
 
         Button viewIncomeButton = new Button("Income");
         viewIncomeButton.setStyle(
@@ -197,16 +192,26 @@ public class Main extends Application {
             "-fx-padding: 6 15;"
         );
         viewIncomeButton.setFont(mozillaTextRegular(12));
+        viewIncomeButton.setOnAction(event -> {
+            manager.filterTransactionsByType(
+                viewIncomeButton.getText()
+            );
+        });
 
-        Button viewExpensesButton = new Button("Expenses");
-        viewExpensesButton.setStyle(
+        Button viewExpenseButton = new Button("Expense");
+        viewExpenseButton.setStyle(
             "-fx-background-radius: 14;" + 
             "-fx-border-radius: 14;" +
             "-fx-background-color: #26a5ea;" +
             "-fx-text-fill: #ffffff;" +
             "-fx-padding: 6 15;"
         );
-        viewExpensesButton.setFont(mozillaTextRegular(12));
+        viewExpenseButton.setFont(mozillaTextRegular(12));
+        viewExpenseButton.setOnAction(event -> {
+            manager.filterTransactionsByType(
+                viewExpenseButton.getText()
+            );
+        });
 
         Button searchButton = new Button("Search");
         searchButton.setStyle(
@@ -217,6 +222,9 @@ public class Main extends Application {
             "-fx-padding: 6 20;"
         );
         searchButton.setFont(mozillaTextBold(12));
+        // searchButton.setOnAction(event -> {
+
+        // });
 
         ToggleGroup transactionTypeGroup = new ToggleGroup();
 
@@ -299,7 +307,7 @@ public class Main extends Application {
             if (descriptionValue.isEmpty()) {
                 manager.showStatusMessage(
                     "ERROR", 
-                    "Description field cannot be blank"
+                    "description field cannot be blank"
                 );
                 return;
             }
@@ -307,7 +315,7 @@ public class Main extends Application {
             if (descriptionValue.length() > 75) {
                 manager.showStatusMessage(
                     "ERROR", 
-                    "Description cannot exceed 75 characters"
+                    "description cannot exceed 75 characters"
                 );
                 return;
             }
@@ -315,25 +323,26 @@ public class Main extends Application {
             try {
                 Double amountValue = Double.parseDouble(amountStr);
                 manager.validateAmount(amountValue);
-                System.out.println(amountStr.formatted(".2f"));
+                Transaction transaction = new Transaction(
+                    amountValue, 
+                    typeValue, 
+                    categoryValue, 
+                    descriptionValue
+                );
+
+                manager.showStatusMessage(
+                    "SUCCESSFUL", 
+                    "Transaction submitted"
+                );
+                manager.saveTransaction(transaction);
             } catch (NumberFormatException e) {
-                manager.showStatusMessage("ERROR", "Invalid number");
+                manager.showStatusMessage(
+                    "ERROR", 
+                    "invalid number. Please try again"
+                );
             } catch (IllegalArgumentException e) {
                 manager.showStatusMessage("ERROR", e.getMessage());
             } 
-
-            String transaction = 
-                amountStr + "," +
-                typeValue + "," +
-                categoryValue + "," +
-                descriptionValue;
-
-            manager.showStatusMessage(
-                "SUCCESSFUL", 
-                "Transaction submitted"
-            );
-            manager.saveTransaction(transaction);
-            manager.loadTransactions(transactionLog);
 
             // amountField.clear();
             // transactionTypeGroup.selectToggle(null);
@@ -375,7 +384,7 @@ public class Main extends Application {
         viewButtonsWrapper.getChildren().addAll(
             viewAllButton,
             viewIncomeButton,
-            viewExpensesButton
+            viewExpenseButton
         );
         viewButtonsWrapper.setAlignment(Pos.CENTER);
 
@@ -383,7 +392,7 @@ public class Main extends Application {
         transactionContainer.getChildren().addAll(
             headingOne,
             controlWrapper,
-            transactionLog,
+            manager.createTransactionsLog(),
             viewButtonsWrapper
         );
 
@@ -429,7 +438,7 @@ public class Main extends Application {
             body
         );
 
-        manager.loadTransactions(transactionLog);
+        manager.loadTransactions();
 
         stage.setScene(new Scene(root, WIDTH, HEIGHT));
         stage.setTitle("Finance Manager");

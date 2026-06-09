@@ -1,22 +1,29 @@
 package src;
 
-public abstract class Transaction {
+public class Transaction {
     protected String type;
+    protected Double amount;
     protected String category;
-    protected double amount;
+    protected String description;
 
-    public Transaction(String type, String category, double amount) {
+    public Transaction(
+        Double amount,
+        String type, 
+        String category, 
+        String description
+    ) {
+        
         this.type = type;
-        this.category = category;
         this.amount = amount;
+        this.category = category;
+        this.description = description;
     }
 
     public String getType() { return this.type; }
 
     public String getCategory() { return this.category; }
 
-    public double getAmount() { return this.amount; }
+    public Double getAmount() { return this.amount; }
 
-    abstract void displayInfo(); 
+    public String getDescription() { return this.description; }
 }
-
