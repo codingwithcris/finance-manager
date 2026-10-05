@@ -18,6 +18,7 @@ class FinanceManager {
     private Label statusTypeLabel = new Label("");
     private Label statusMessageLabel = new Label("");
     private TextArea transactionLog = new TextArea();
+    private double balance = 0;
 
     public FinanceManager() {
         transactionsList = new ArrayList<>();
@@ -37,10 +38,30 @@ class FinanceManager {
         transactionLog.setPrefHeight(200);
         transactionLog.setMaxWidth(580);
         transactionLog.setStyle("-fx-background-color: #ececec;");
-        transactionLog.setFont(Main.mozillaTextRegular(14));
+        transactionLog.setFont(Main.mozillaTextRegular(12));
 
         return transactionLog;
     }
+
+    public void calculateBalance() {
+        double totalIncome = 0;
+        double totalExpense = 0;
+
+        for (Transaction transaction : transactionsList) {
+            String type = transaction.getType();
+            double amount = transaction.getAmount();
+
+            if (type.equalsIgnoreCase("Income")) {
+                totalIncome += amount;
+            } else if (type.equalsIgnoreCase("Expense")) {
+                totalExpense += amount;
+            }
+        }
+
+       this.balance = totalIncome - totalExpense;
+    }
+
+    public double getBalance() { return this.balance; }
 
     public HBox createStatusBar() {
         statusBar.getChildren().addAll(
@@ -77,14 +98,14 @@ class FinanceManager {
         statusMessageLabel.setText("");
     }
 
-    public void saveTransaction(Transaction transaction) {
+    public void saveTransaction(Transaction newTransaction) {
         try (PrintWriter writer = new PrintWriter(new FileWriter(FILE_PATH, true))) {
             writer.printf(
                 "%.2f,%s,%s,%s\n", 
-                transaction.getAmount(), 
-                transaction.getType(),
-                transaction.getCategory(),
-                transaction.getDescription()
+                newTransaction.getAmount(), 
+                newTransaction.getType(),
+                newTransaction.getCategory(),
+                newTransaction.getDescription()
             );
         } catch (IOException e) {
             showStatusMessage(
@@ -170,6 +191,37 @@ class FinanceManager {
             transactionLog.setPromptText(
                 "Cannot find " + query.toLowerCase() + " transactions"
             );
+        }
+    }
+
+    public void filterTransactionByCategory(String query) {
+        StringBuilder sb = new StringBuilder();
+        boolean foundTransactionCategory = false;
+
+        for (Transaction transaction : transactionsList) {
+            String category = transaction.getCategory().toLowerCase();
+
+            if (category.contains(query.toLowerCase())) {
+                sb.append(formatTransaction(transaction));
+                foundTransactionCategory = true;
+            }
+        }
+        transactionLog.setText(sb.toString());
+
+        if (!foundTransactionCategory == true) {
+            transactionLog.setPromptText(
+                "Cannot find transactions under " + query.toLowerCase()
+            );
+        }
+    }
+
+    public void updateTransactionLog(Transaction newTransaction) {
+        StringBuilder sb = new StringBuilder();    
+        transactionsList.add(newTransaction);
+
+        for (Transaction transaction : transactionsList) {
+            sb.append(formatTransaction(transaction));
+            transactionLog.setText(sb.toString());
         }
     }
 }

@@ -1,4 +1,5 @@
 package src;
+
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.stage.Stage;
@@ -8,8 +9,7 @@ import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 
 public class Main extends Application {
-    private static final int WIDTH = 600;
-    private static final int HEIGHT = 720;
+    private static final int WIDTH = 600, HEIGHT = 720;
     public static void main(String[] args) {
         launch(args);
     }
@@ -31,7 +31,6 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) {
         FinanceManager manager = new FinanceManager();
-
         // TEXT
         Label balanceAmount = new Label("$0.00");
         balanceAmount.setStyle("-fx-text-fill: #ffffff;");
@@ -77,7 +76,7 @@ public class Main extends Application {
         );
         filterCategoryField.setFont(mozillaTextRegular(11));
         filterCategoryField.textProperty().addListener((obs, oldValue, newValue) -> {
-            if (!newValue.matches("[a-zA-Z]*")) {
+            if (!newValue.matches("[a-zA-Z\s]*")) {
                 filterCategoryField.setText(oldValue);
             }
         });
@@ -168,49 +167,75 @@ public class Main extends Application {
         inequalityDropDown.setValue("Exactly");
 
         // BUTTONS 
-        Button viewAllButton = new Button("All");
-        viewAllButton.setStyle(
+        String viewButtonDefaultStyle = 
+            "-fx-background-radius: 14;" + 
+            "-fx-border-radius: 14;" + 
+            "-fx-background-color: #26a5ea;" +
+            "-fx-text-fill: #ffffff;"  +
+            "-fx-padding: 7 18;"
+        ;
+
+        String viewButtonActiveStyle = 
             "-fx-background-radius: 14;" + 
             "-fx-border-radius: 14;" + 
             "-fx-background-color: #0072b1;" +
             "-fx-text-fill: #ffffff;"  +
-            "-fx-padding: 6 18;"
-        );
+            "-fx-padding: 7 18;"
+        ;
+
+        Button viewAllButton = new Button("All");
+        viewAllButton.setStyle(viewButtonActiveStyle);
         viewAllButton.setFont(mozillaTextBold(12));
+
+        Button viewIncomeButton = new Button("Income");
+        viewIncomeButton.setStyle(viewButtonDefaultStyle);
+        viewIncomeButton.setFont(mozillaTextRegular(12));
+
+        Button viewExpenseButton = new Button("Expense");
+        viewExpenseButton.setStyle(viewButtonDefaultStyle);
+        viewExpenseButton.setFont(mozillaTextRegular(12));
+
+        // 
         viewAllButton.setOnAction(event -> {
             manager.filterTransactionsByType(
                 viewAllButton.getText()
             );
+            viewAllButton.setFont(mozillaTextBold(12));
+            viewAllButton.setStyle(viewButtonActiveStyle);
+
+            viewExpenseButton.setFont(mozillaTextRegular(12));
+            viewExpenseButton.setStyle(viewButtonDefaultStyle);
+            
+            viewIncomeButton.setFont(mozillaTextRegular(12));
+            viewIncomeButton.setStyle(viewButtonDefaultStyle);
         });
 
-        Button viewIncomeButton = new Button("Income");
-        viewIncomeButton.setStyle(
-            "-fx-background-radius: 14;" + 
-            "-fx-border-radius: 14;" +
-            "-fx-background-color: #26a5ea;" +
-            "-fx-text-fill: #ffffff;" +
-            "-fx-padding: 6 15;"
-        );
-        viewIncomeButton.setFont(mozillaTextRegular(12));
-        viewIncomeButton.setOnAction(event -> {
-            manager.filterTransactionsByType(
-                viewIncomeButton.getText()
-            );
-        });
-
-        Button viewExpenseButton = new Button("Expense");
-        viewExpenseButton.setStyle(
-            "-fx-background-radius: 14;" + 
-            "-fx-border-radius: 14;" +
-            "-fx-background-color: #26a5ea;" +
-            "-fx-text-fill: #ffffff;" +
-            "-fx-padding: 6 15;"
-        );
-        viewExpenseButton.setFont(mozillaTextRegular(12));
         viewExpenseButton.setOnAction(event -> {
             manager.filterTransactionsByType(
                 viewExpenseButton.getText()
             );
+            viewExpenseButton.setFont(mozillaTextBold(12));
+            viewExpenseButton.setStyle(viewButtonActiveStyle);
+
+            viewAllButton.setFont(mozillaTextRegular(12));
+            viewAllButton.setStyle(viewButtonDefaultStyle);
+
+            viewIncomeButton.setFont(mozillaTextRegular(12));
+            viewIncomeButton.setStyle(viewButtonDefaultStyle);
+        });
+
+        viewIncomeButton.setOnAction(event -> {
+            manager.filterTransactionsByType(
+                viewIncomeButton.getText()
+            );
+            viewIncomeButton.setStyle(viewButtonActiveStyle);
+            viewIncomeButton.setFont(mozillaTextBold(12));
+
+            viewAllButton.setFont(mozillaTextRegular(12));
+            viewAllButton.setStyle(viewButtonDefaultStyle);
+
+            viewExpenseButton.setFont(mozillaTextRegular(12));
+            viewExpenseButton.setStyle(viewButtonDefaultStyle);
         });
 
         Button searchButton = new Button("Search");
@@ -222,9 +247,18 @@ public class Main extends Application {
             "-fx-padding: 6 20;"
         );
         searchButton.setFont(mozillaTextBold(12));
-        // searchButton.setOnAction(event -> {
+        searchButton.setOnAction(event -> {
+            String category = filterCategoryField.getText().trim();
 
-        // });
+            if (category.length() == 0) {
+                manager.showStatusMessage(
+                    "ERROR", 
+                    "Cannot match category"
+                );
+            } else {
+                manager.filterTransactionByCategory(category);
+            }
+        });
 
         ToggleGroup transactionTypeGroup = new ToggleGroup();
 
@@ -260,7 +294,9 @@ public class Main extends Application {
                     "Salary",
                     "Gift",
                     "Freelance",
-                    "Scholarship"
+                    "Scholarship",
+                    "Refund",
+                    "Other income"
                 );
                 categoryDropDown.setValue("Salary");
             } else if (newValue == expenseRadioButton) {
@@ -270,7 +306,10 @@ public class Main extends Application {
                     "Utilities",
                     "Entertainment",
                     "Memberships",
-                    "Pet care"
+                    "Pet care",
+                    "Healthcare",
+                    "Education",
+                    "Other expense"
                 );
                 categoryDropDown.setValue("Rent");
             }
@@ -321,7 +360,7 @@ public class Main extends Application {
             }
 
             try {
-                Double amountValue = Double.parseDouble(amountStr);
+                double amountValue = Double.parseDouble(amountStr);
                 manager.validateAmount(amountValue);
                 Transaction transaction = new Transaction(
                     amountValue, 
@@ -335,6 +374,11 @@ public class Main extends Application {
                     "Transaction submitted"
                 );
                 manager.saveTransaction(transaction);
+                manager.updateTransactionLog(transaction);
+                manager.calculateBalance();
+                double newBalance = manager.getBalance();
+                String newBalanceStr = String.format("$%.2f", newBalance);
+                balanceAmount.setText(newBalanceStr);
             } catch (NumberFormatException e) {
                 manager.showStatusMessage(
                     "ERROR", 
@@ -342,12 +386,13 @@ public class Main extends Application {
                 );
             } catch (IllegalArgumentException e) {
                 manager.showStatusMessage("ERROR", e.getMessage());
+                return;
             } 
 
-            // amountField.clear();
-            // transactionTypeGroup.selectToggle(null);
-            // categoryDropDown.getSelectionModel().clearSelection();
-            // descriptionField.clear();
+            amountField.clear();
+            transactionTypeGroup.selectToggle(null);
+            categoryDropDown.getSelectionModel().clearSelection();
+            descriptionField.clear();
         });
 
         Button clearFormButton = new Button("Clear Form");
@@ -439,6 +484,11 @@ public class Main extends Application {
         );
 
         manager.loadTransactions();
+        manager.calculateBalance();
+
+        double balance = manager.getBalance();
+        String balanceStr = String.format("$%.2f", balance);
+        balanceAmount.setText(balanceStr);
 
         stage.setScene(new Scene(root, WIDTH, HEIGHT));
         stage.setTitle("Finance Manager");
