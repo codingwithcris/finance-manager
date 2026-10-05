@@ -1,41 +1,16 @@
-# Finance Manager (Java)
+# Financial Manager
+This project is a personal finance application built with JavaFX. The application connects to a PostgreSQL database, allowing users to enter and categorize transactions based on their amount, type, and category.
 
-A finance management application written in Java for my **Advanced Programming with Java** course.  
+The project is currently undergoing a redesign of its graphical user interface to improve usability and add new features.
 
-Users can input their income and expenses, categorize transactions, and view their financial status. This project focuses on managing financial data, performing calculations, and applying object-oriented programming (OOP) concepts such as inheritance and encapsulation.
+## Project Timeline
+The project originally began as a command-line application that allowed users to enter transactions and store their data in a file.
 
-The application currently runs as a console-based program but it is actively under development and will evolve into a graphical user interface (GUI) application using JavaFX.
-
----
-
-## Features (Current)
-
-- Categorize income and expenses
-- Store transaction details (type, category, amount)
-- Demonstrates object-oriented programming concepts
-- Command-line interface for user interaction
-
----
-
-## Planned Features
-
-- Implement additional OOP principles
-  - Abstraction
-  - Interfaces
-- Implement JavaFX GUI
-- Improve error handling and input validation
-
----
-
-## Technologies Used
-
-- Java
-- Object-Oriented Programming
-- Java Collections (ArrayList)
-- Scanner (User input)
-
----
-
-## How to Run
-
-1. Clone the repository
+## What I Learned
+Object-Oriented Programmingg
+  * Encapsulation
+  * Abstraction
+  * Polymorphism
+  * Inheritance
+Exception handling using `try`/`catch`/`finally`
+File I/O for writing and retrieving data from files
